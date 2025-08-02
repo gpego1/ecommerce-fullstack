@@ -1,35 +1,69 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Home from './pages/Home';
+import CustomerRegistration from './pages/CustomerRegistration';
+import CartPage from './pages/CartPage';
+import { useCart } from './hooks/useCart';
+import SidebarCart from "./components/SideBarCart.tsx";
 
 function App() {
-  const [count, setCount] = useState(0)
+    const {
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        cartTotal,
+        cartItemCount,
+        isCartOpen,
+        setIsCartOpen,
+    } = useCart();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    return (
+        <Router>
+            <div className="min-h-screen bg-gray-100">
+                <Header
+                    cartItemCount={cartItemCount}
+                    onCartClick={() => setIsCartOpen(true)}
+                />
+
+                <SidebarCart
+                    isOpen={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
+                    cartItems={cartItems}
+                    onRemoveItem={removeFromCart}
+                    onUpdateQuantity={updateQuantity}
+                    cartTotal={cartTotal}
+                    onCheckout={() => {
+                        setIsCartOpen(false);
+                    }}
+                />
+
+                <main className="pb-12">
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={<Home onAddToCart={addToCart} />}
+                        />
+                        <Route
+                            path="/cadastro"
+                            element={<CustomerRegistration />}
+                        />
+                        <Route
+                            path="/carrinho"
+                            element={
+                                <CartPage
+                                    cartItems={cartItems}
+                                    onRemoveItem={removeFromCart}
+                                    onUpdateQuantity={updateQuantity}
+                                    cartTotal={cartTotal}
+                                />
+                            }
+                        />
+                    </Routes>
+                </main>
+            </div>
+        </Router>
+    );
 }
 
-export default App
+export default App;
