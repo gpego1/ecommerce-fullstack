@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 @Data
@@ -24,4 +26,10 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "roles", columnDefinition = "VARCHAR(255)")
+    @Enumerated(EnumType.STRING)
+    private List<Roles> roles;
 }

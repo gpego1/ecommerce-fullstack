@@ -66,6 +66,7 @@ public class UserController {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setPassword(dto.password());
+        user.setRoles(dto.roles());
         service.updateUser(user);
         return ResponseEntity.noContent().build();
     }
