@@ -64,6 +64,7 @@ public class UserController {
 
         User user = foundedUser.get();
         user.setName(dto.name());
+        user.setUsername(dto.username());
         user.setEmail(dto.email());
         user.setPassword(dto.password());
         user.setRoles(dto.roles());

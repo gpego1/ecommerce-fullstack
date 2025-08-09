@@ -1,4 +1,7 @@
 spring:
+  security:
+    jwt:
+      secret: Z3Vlc3RhbGF1dGhlbnRpY2FjaGFlMTIzNDU2Nzg5MA==
   datasource:
     url: jdbc:mysql://localhost:3306/ecommerce
     username: root

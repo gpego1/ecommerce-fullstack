@@ -11,6 +11,7 @@ import java.util.List;
 public record UserDTO(
         Long id,
         @NotBlank(message = "Required data") String name,
+        @NotBlank(message = "Required data") @Email String username,
         @NotBlank(message = "Required data") @Email String email,
         @NotBlank(message = "Required data") String password,
         List<Roles> roles

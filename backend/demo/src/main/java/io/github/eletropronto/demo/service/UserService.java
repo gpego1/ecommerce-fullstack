@@ -3,6 +3,7 @@ import io.github.eletropronto.demo.model.User;
 import io.github.eletropronto.demo.repository.UserRepository;
 import io.github.eletropronto.demo.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,6 +14,7 @@ public class UserService {
 
     private final UserRepository repository;
     private final UserValidator validator;
+    private final PasswordEncoder encoder;
 
     public Optional<User> findById(Long id){
         return repository.findById(id);
@@ -20,6 +22,7 @@ public class UserService {
 
     public User save(User user){
         validator.validate(user);
+        user.setPassword(encoder.encode(user.getPassword()));
         return repository.save(user);
     }
     public User updateUser(User user){
