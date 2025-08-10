@@ -22,8 +22,8 @@ public class UserValidator {
         }
     }
     private boolean existsUser(User user){
-        Optional<User> foundedUser = repository.findByEmailAndPassword(
-                user.getEmail(), user.getPassword()
+        Optional<User> foundedUser = repository.findByUsernameAndPassword(
+                user.getUsername(), user.getPassword()
         );
         if(user.getId() == null){
             return foundedUser.isPresent();
