@@ -13,6 +13,6 @@ export interface CartItem extends Product {
 export interface Customer {
     id?: string,
     name: string,
-    email: string,
+    username: string,
     password: string;
 }

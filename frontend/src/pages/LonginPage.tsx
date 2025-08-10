@@ -3,47 +3,57 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../components/generic/Card';
 import Input from '../components/generic/Input';
 import Button from '../components/generic/Button';
-import type { Customer } from '../types/types';
 import api from '../api';
-import { FiUser, FiMail, FiLock, FiArrowLeft } from 'react-icons/fi';
+import { FiMail, FiLock, FiArrowLeft, FiAlertCircle } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext.tsx';
 
-const CustomerRegistration: React.FC = () => {
+const Login: React.FC = () => {
     const navigate = useNavigate();
-    const [customer, setCustomer] = useState<Customer>({
-        name: '',
+    const { login } = useAuth();
+    const [credentials, setCredentials] = useState({
         username: '',
         password: '',
     });
-    const [errors, setErrors] = useState<Partial<Customer>>({});
+    const [errors, setErrors] = useState({
+        username: '',
+        password: '',
+        general: ''
+    });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setCustomer(prev => ({ ...prev, [name]: value }));
+        setCredentials(prev => ({ ...prev, [name]: value }));
         // Clear error when typing
-        if (errors[name as keyof Customer]) {
-            setErrors(prev => ({ ...prev, [name]: undefined }));
+        if (errors[name as keyof typeof errors]) {
+            setErrors(prev => ({ ...prev, [name]: '', general: '' }));
         }
     };
 
     const validate = (): boolean => {
-        const newErrors: Partial<Customer> = {};
+        const newErrors = {
+            username: '',
+            password: '',
+            general: ''
+        };
+        let isValid = true;
 
-        if (!customer.name.trim()) newErrors.name = 'Nome é obrigatório';
-        if (!customer.username.trim()) {
+        if (!credentials.username.trim()) {
             newErrors.username = 'Email é obrigatório';
-        } else if (!/^\S+@\S+\.\S+$/.test(customer.username)) {
+            isValid = false;
+        } else if (!/^\S+@\S+\.\S+$/.test(credentials.username)) {
             newErrors.username = 'Email inválido';
+            isValid = false;
         }
-        if (!customer.password) {
+
+        if (!credentials.password) {
             newErrors.password = 'Senha é obrigatória';
-        } else if (customer.password.length < 6) {
-            newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+            isValid = false;
         }
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        return isValid;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -52,22 +62,24 @@ const CustomerRegistration: React.FC = () => {
 
         if (validate()) {
             try {
-                const response = await api.post('/auth/register', customer);
+                const response = await api.post('/auth/login', credentials);
 
-                if (response.status >= 200 && response.status < 300) {
-                    // Success animation before redirect
-                    setTimeout(() => {
-                        navigate('/login', { state: { registrationSuccess: true } });
-                    }, 1500);
+                if (response.status === 200) {
+                    login(response.data.token);
+                    navigate('/');
                 }
             } catch (error: any) {
-                if (error.response?.data) {
-                    setErrors(error.response.data);
-                } else {
-                    console.error("Erro inesperado:", error);
+                if (error.response?.status === 401) {
                     setErrors({
-                        username: "Erro ao cadastrar. Tente novamente."
+                        ...errors,
+                        general: 'Credenciais inválidas. Verifique seu email e senha.'
                     });
+                } else {
+                    setErrors({
+                        ...errors,
+                        general: 'Erro ao fazer login. Tente novamente mais tarde.'
+                    });
+                    console.error("Erro inesperado:", error);
                 }
             } finally {
                 setIsSubmitting(false);
@@ -94,34 +106,31 @@ const CustomerRegistration: React.FC = () => {
                             <FiArrowLeft className="mr-2" />
                             Voltar
                         </button>
-                        <h2 className="text-3xl font-bold text-center">Crie sua conta</h2>
+                        <h2 className="text-3xl font-bold text-center">Bem-vindo de volta</h2>
                         <p className="text-center text-blue-100 mt-2">
-                            Já tem uma conta?{' '}
+                            Novo por aqui?{' '}
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={() => navigate('/cadastro')}
                                 className="font-semibold hover:underline"
                             >
-                                Faça login
+                                Crie uma conta
                             </button>
                         </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                        <Input
-                            label="Nome completo"
-                            name="name"
-                            value={customer.name}
-                            onChange={handleChange}
-                            error={errors.name}
-                            icon={<FiUser className="text-gray-400" />}
-                            placeholder="Digite seu nome completo"
-                        />
+                        {errors.general && (
+                            <div className="flex items-center p-4 text-sm text-red-800 rounded-lg bg-red-50">
+                                <FiAlertCircle className="flex-shrink-0 mr-3 text-red-500 text-lg" />
+                                <span>{errors.general}</span>
+                            </div>
+                        )}
 
                         <Input
                             label="Email"
                             type="email"
                             name="username"
-                            value={customer.username}
+                            value={credentials.username}
                             onChange={handleChange}
                             error={errors.username}
                             icon={<FiMail className="text-gray-400" />}
@@ -132,14 +141,36 @@ const CustomerRegistration: React.FC = () => {
                             label="Senha"
                             type="password"
                             name="password"
-                            value={customer.password}
+                            value={credentials.password}
                             onChange={handleChange}
                             error={errors.password}
                             icon={<FiLock className="text-gray-400" />}
-                            placeholder="Mínimo 6 caracteres"
+                            placeholder="Digite sua senha"
                         />
 
-                        <div className="pt-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <input
+                                    id="remember-me"
+                                    name="remember-me"
+                                    type="checkbox"
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                                    Lembrar de mim
+                                </label>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => navigate('/recuperar-senha')}
+                                className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                            >
+                                Esqueceu sua senha?
+                            </button>
+                        </div>
+
+                        <div className="pt-2">
                             <Button
                                 type="submit"
                                 variant="primary"
@@ -152,23 +183,12 @@ const CustomerRegistration: React.FC = () => {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Cadastrando...
+                                        Entrando...
                                     </span>
                                 ) : (
-                                    "Cadastrar"
+                                    "Entrar"
                                 )}
                             </Button>
-                        </div>
-
-                        <div className="text-center text-sm text-gray-500">
-                            Ao se cadastrar, você concorda com nossos{' '}
-                            <button className="text-blue-600 hover:underline font-medium">
-                                Termos de Serviço
-                            </button>{' '}
-                            e{' '}
-                            <button className="text-blue-600 hover:underline font-medium">
-                                Política de Privacidade
-                            </button>.
                         </div>
                     </form>
                 </Card>
@@ -177,4 +197,4 @@ const CustomerRegistration: React.FC = () => {
     );
 };
 
-export default CustomerRegistration;
+export default Login;
