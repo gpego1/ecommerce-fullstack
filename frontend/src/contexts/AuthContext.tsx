@@ -15,6 +15,10 @@ interface User {
     id: string;
     name: string;
     email: string;
+    phone: string;
+    bio: string;
+    registerDate?: string
+    lastUpdateDate?: string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,7 +33,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const loadUser = async () => {
             if (token) {
                 try {
-                    const response = await api.get('/auth/me', {
+                    const response = await api.get('/auth/users/me', {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -49,7 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const login = (newToken: string) => {
         localStorage.setItem('token', newToken);
         setToken(newToken);
-        navigate('/');
+        navigate('/profile');
     };
 
     const logout = () => {

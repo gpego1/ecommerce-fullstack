@@ -7,6 +7,7 @@ import { useCart } from './hooks/useCart';
 import SidebarCart from "./components/SideBarCart.tsx";
 import Login from "./pages/LonginPage.tsx";
 import { AuthProvider } from './contexts/AuthContext';
+import  ProfilePage  from './pages/ProfilePage.tsx'
 
 function App() {
     const {
@@ -65,6 +66,11 @@ function App() {
                                 />
                             }
                         />
+                        <Route
+                            path="/profile"
+                            element={<ProfilePage />}
+                        />
+
                     </Routes>
                 </AuthProvider>
             </main>

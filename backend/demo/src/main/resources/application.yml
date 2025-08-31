@@ -1,7 +1,7 @@
 spring:
   security:
     jwt:
-      secret: Z3Vlc3RhbGF1dGhlbnRpY2FjaGFlMTIzNDU2Nzg5MA==
+      secret: QmFzZTY0U2VjdXJlS2V5Rm9ySldUQXV0aGVudGljYXRpb24=
   datasource:
     url: jdbc:mysql://localhost:3306/ecommerce
     username: root
@@ -15,5 +15,9 @@ spring:
       hibernate.format_sql: true
 server:
   port: 8080
-
+logging:
+  level:
+    root: WARN
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
 

@@ -5,6 +5,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
@@ -12,10 +14,11 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private String SECRET = "QmFzZTY0U2VjdXJlS2V5Rm9ySldUQXV0aGVudGljYXRpb24=";
+    @Value(value = "${spring.security.jwt.secret}")
+    private String SECRET;
 
     private Key getSignInKey(){
-        byte[] keyBites = Decoders.BASE64.decode(SECRET);
+        byte[] keyBites = SECRET.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBites);
     }
 

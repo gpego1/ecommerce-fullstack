@@ -1,81 +1,109 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Card from '../components/generic/Card';
-import Input from '../components/generic/Input';
-import Button from '../components/generic/Button';
-import type { Customer } from '../types/types';
-import api from '../api';
-import { FiUser, FiMail, FiLock, FiArrowLeft } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Card from "../components/generic/Card"
+import Input from "../components/generic/Input"
+import Button from "../components/generic/Button"
+import type { Customer } from "../types/types"
+import api from "../api"
+import { FiUser, FiMail, FiLock, FiPhone, FiArrowLeft } from "react-icons/fi"
+import { motion } from "framer-motion"
 
 const CustomerRegistration: React.FC = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     const [customer, setCustomer] = useState<Customer>({
-        name: '',
-        username: '',
-        password: '',
-    });
-    const [errors, setErrors] = useState<Partial<Customer>>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
+        name: "",
+        username: "",
+        password: "",
+        phone: "",
+        bio: "",
+        registerDate: "",
+        lastUpdateDate: "",
+    })
+    const [errors, setErrors] = useState<Partial<Customer>>({})
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setCustomer(prev => ({ ...prev, [name]: value }));
-        // Clear error when typing
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target
+        setCustomer((prev) => ({ ...prev, [name]: value }))
         if (errors[name as keyof Customer]) {
-            setErrors(prev => ({ ...prev, [name]: undefined }));
+            setErrors((prev) => ({ ...prev, [name]: undefined }))
         }
-    };
+    }
+
+    // Função para formatar data no padrão dd/MM/yyyy HH:mm:ss
+    const formatDate = (date: Date) => {
+        const pad = (n: number) => n.toString().padStart(2, "0")
+        return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+    }
 
     const validate = (): boolean => {
-        const newErrors: Partial<Customer> = {};
+        const newErrors: Partial<Customer> = {}
 
-        if (!customer.name.trim()) newErrors.name = 'Nome é obrigatório';
+        if (!customer.name.trim()) newErrors.name = "Nome é obrigatório"
         if (!customer.username.trim()) {
-            newErrors.username = 'Email é obrigatório';
+            newErrors.username = "Email é obrigatório"
         } else if (!/^\S+@\S+\.\S+$/.test(customer.username)) {
-            newErrors.username = 'Email inválido';
+            newErrors.username = "Email inválido"
         }
         if (!customer.password) {
-            newErrors.password = 'Senha é obrigatória';
+            newErrors.password = "Senha é obrigatória"
         } else if (customer.password.length < 6) {
-            newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+            newErrors.password = "Senha deve ter pelo menos 6 caracteres"
         }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+        if (!customer.phone.trim()) {
+            newErrors.phone = "Telefone é obrigatório"
+        } else if (!/^\d{10,11}$/.test(customer.phone)) {
+            newErrors.phone = "Telefone inválido. Apenas números (10-11 dígitos)."
+        }
+
+        if (customer.bio && customer.bio.length > 200) {
+            newErrors.bio = "Biografia deve ter no máximo 200 caracteres"
+        }
+
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
+        e.preventDefault()
+        setIsSubmitting(true)
 
         if (validate()) {
             try {
-                const response = await api.post('/auth/register', customer);
+                const now = formatDate(new Date())
+                const payload = {
+                    ...customer,
+                    registerDate: now,
+                    lastUpdateDate: now,
+                }
+
+                const response = await api.post("/auth/register", payload)
 
                 if (response.status >= 200 && response.status < 300) {
-                    // Success animation before redirect
                     setTimeout(() => {
-                        navigate('/login', { state: { registrationSuccess: true } });
-                    }, 1500);
+                        navigate("/login", { state: { registrationSuccess: true } })
+                    }, 1500)
                 }
             } catch (error: any) {
                 if (error.response?.data) {
-                    setErrors(error.response.data);
+                    setErrors(error.response.data)
                 } else {
-                    console.error("Erro inesperado:", error);
+                    console.error("Erro inesperado:", error)
                     setErrors({
-                        username: "Erro ao cadastrar. Tente novamente."
-                    });
+                        username: "Erro ao cadastrar. Tente novamente.",
+                    })
                 }
             } finally {
-                setIsSubmitting(false);
+                setIsSubmitting(false)
             }
         } else {
-            setIsSubmitting(false);
+            setIsSubmitting(false)
         }
-    };
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -88,18 +116,24 @@ const CustomerRegistration: React.FC = () => {
                 <Card className="bg-white rounded-xl shadow-2xl overflow-hidden">
                     <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
                         <button
-                            onClick={() => navigate(-1)}
-                            className="flex items-center text-sm font-medium text-blue-100 hover:text-white mb-4 transition-colors"
+                            onClick={() => navigate("/")}
+                            className="flex items-center mb-4 px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg text-sm font-medium
+                               hover:bg-white/20 hover:border-white/30
+                               focus:outline-none focus:ring-2 focus:ring-white/30
+                               transition-all duration-200 ease-in-out backdrop-blur-sm"
                         >
                             <FiArrowLeft className="mr-2" />
                             Voltar
                         </button>
                         <h2 className="text-3xl font-bold text-center">Crie sua conta</h2>
                         <p className="text-center text-blue-100 mt-2">
-                            Já tem uma conta?{' '}
+                            Já tem uma conta?{" "}
                             <button
-                                onClick={() => navigate('/login')}
-                                className="font-semibold hover:underline"
+                                onClick={() => navigate("/login")}
+                                className="inline-block px-4 py-2 ml-2 bg-white text-blue-600 rounded-lg text-sm font-medium
+                                   hover:bg-blue-50 hover:text-blue-700
+                                   focus:outline-none focus:ring-2 focus:ring-white/30
+                                   transition-all duration-200 ease-in-out"
                             >
                                 Faça login
                             </button>
@@ -139,42 +173,46 @@ const CustomerRegistration: React.FC = () => {
                             placeholder="Mínimo 6 caracteres"
                         />
 
+                        <Input
+                            label="Telefone"
+                            name="phone"
+                            value={customer.phone}
+                            onChange={handleChange}
+                            error={errors.phone}
+                            icon={<FiPhone className="text-gray-400" />}
+                            placeholder="Apenas números, 10-11 dígitos"
+                        />
+
+                        <Input
+                            label="Biografia"
+                            name="bio"
+                            value={customer.bio}
+                            onChange={handleChange}
+                            error={errors.bio}
+                            placeholder="Conte um pouco sobre você (opcional, até 200 caracteres)"
+                        />
+
                         <div className="pt-4">
                             <Button
                                 type="submit"
                                 variant="primary"
-                                className="w-full py-3 font-medium rounded-lg"
+                                className="cursor-pointer w-full py-3 font-medium rounded-lg"
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? (
-                                    <span className="flex items-center justify-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Cadastrando...
-                                    </span>
-                                ) : (
-                                    "Cadastrar"
-                                )}
+                                {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                             </Button>
                         </div>
 
                         <div className="text-center text-sm text-gray-500">
-                            Ao se cadastrar, você concorda com nossos{' '}
-                            <button className="text-blue-600 hover:underline font-medium">
-                                Termos de Serviço
-                            </button>{' '}
-                            e{' '}
-                            <button className="text-blue-600 hover:underline font-medium">
-                                Política de Privacidade
-                            </button>.
+                            Ao se cadastrar, você concorda com nossos{" "}
+                            <button className="text-blue-600 hover:underline font-medium">Termos de Serviço</button> e{" "}
+                            <button className="text-blue-600 hover:underline font-medium">Política de Privacidade</button>.
                         </div>
                     </form>
                 </Card>
             </motion.div>
         </div>
-    );
-};
+    )
+}
 
-export default CustomerRegistration;
+export default CustomerRegistration

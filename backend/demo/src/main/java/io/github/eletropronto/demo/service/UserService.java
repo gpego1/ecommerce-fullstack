@@ -20,6 +20,10 @@ public class UserService {
         return repository.findById(id);
     }
 
+    public Optional<User> getUserByUsername(String username){
+        return repository.findByUsername(username);
+    }
+
     public User save(User user){
         validator.validate(user);
         user.setPassword(encoder.encode(user.getPassword()));

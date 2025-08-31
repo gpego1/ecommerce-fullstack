@@ -66,6 +66,11 @@ public class UserController {
         user.setName(dto.name());
         user.setUsername(dto.username());
         user.setPassword(dto.password());
+        user.setPhone(user.getPhone());
+        user.setBio(user.getBio());
+        user.setRegisterDate(user.getRegisterDate());
+        user.setLastUpdateDate(user.getLastUpdateDate());
+        user.setProfilePicture(user.getProfilePicture());
         user.setRoles(dto.roles());
         service.updateUser(user);
         return ResponseEntity.noContent().build();

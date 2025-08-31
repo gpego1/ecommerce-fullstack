@@ -15,4 +15,8 @@ export interface Customer {
     name: string,
     username: string,
     password: string;
+    phone: string;
+    bio: string;
+    registerDate?: string
+    lastUpdateDate?: string
 }
