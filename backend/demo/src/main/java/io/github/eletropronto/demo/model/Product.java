@@ -24,4 +24,8 @@ public class Product {
 
     @Column(name = "price")
     private Double price;
+
+    @ManyToOne
+    @JoinColumn(name = "orderId")
+    private Order order;
 }

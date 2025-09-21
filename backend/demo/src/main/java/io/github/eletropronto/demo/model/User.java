@@ -53,4 +53,12 @@ public class User {
     @Column(name = "last_modified_date")
     private LocalDateTime lastUpdateDate;
 
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "Orders", columnDefinition = "VARCHAR(255)")
+    private List<Order> orders;
+
+
+
+
+
 }
