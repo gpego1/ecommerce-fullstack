@@ -1,23 +1,24 @@
 spring:
   security:
     jwt:
-      secret: QmFzZTY0U2VjdXJlS2V5Rm9ySldUQXV0aGVudGljYXRpb24=
+      secret: ${SPRING_SECURITY_JWT_SECRET}
   datasource:
-    url: jdbc:mysql://localhost:3306/ecommerce
-    username: root
-    password: 1234
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
-    show-sql: true
+    show-sql: ${SPRING_JPA_SHOW_SQL}
     hibernate:
-      ddl-auto: update
-      database-plataform: org.hibernate.dialect.MySQL8Dialect
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      database-plataform: ${SPRING_JPA_DATABASE_PLATFORM}
     properties:
-      hibernate.format_sql: true
+      hibernate.format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL}
+
 server:
-  port: 8080
+  port: ${SERVER_PORT}
+
 logging:
   level:
-    root: WARN
-    org.springframework: INFO
-    org.hibernate.SQL: DEBUG
-
+    root: ${LOGGING_LEVEL_ROOT}
+    org.springframework: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
+    org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL}
