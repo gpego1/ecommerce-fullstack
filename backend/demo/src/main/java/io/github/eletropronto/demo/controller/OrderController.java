@@ -23,7 +23,7 @@ public class OrderController {
     private final OrderService service;
     private final OrderMapper mapper;
 
-    @GetMapping
+    @GetMapping("/{id}")
     public ResponseEntity<Order> getOrdersById(@PathVariable Long id) {
         Optional<Order> order = service.findOrderById(id);
         return order.map(value -> new ResponseEntity<>(value, HttpStatus.OK))

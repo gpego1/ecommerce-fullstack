@@ -23,4 +23,7 @@ public class Address {
 
     @Column(name = "city", length = 30, nullable = false)
     private String city;
+
+    @Column(name = "number", length = 10, nullable = false)
+    private String number;
 }
