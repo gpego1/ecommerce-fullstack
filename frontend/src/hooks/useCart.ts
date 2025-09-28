@@ -39,6 +39,11 @@ export const useCart = () => {
 
     const cartItemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
 
+    const clearCart = () => {
+        setCartItems([]);
+    }
+
+
     return {
         cartItems,
         addToCart,
@@ -48,5 +53,6 @@ export const useCart = () => {
         cartItemCount,
         isCartOpen,
         setIsCartOpen,
+        clearCart
     };
 };

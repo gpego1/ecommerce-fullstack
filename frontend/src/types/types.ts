@@ -11,7 +11,7 @@ export interface CartItem extends Product {
 }
 
 export interface Customer {
-    id?: string,
+    id?: number,
     name: string,
     username: string,
     password: string;
@@ -20,3 +20,4 @@ export interface Customer {
     registerDate?: string
     lastUpdateDate?: string
 }
+
