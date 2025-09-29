@@ -48,7 +48,7 @@ public class ProductController {
         Path filePath = Paths.get(uploadDir).toAbsolutePath().resolve(subPath).normalize();
 
         //System.out.println("Caminho do Arquivo sendo procurado: " + filePath.toString());
-        
+
         Resource resource;
         try {
             resource = new UrlResource(filePath.toUri());

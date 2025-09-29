@@ -1,6 +1,7 @@
 file:
   upload-dir: ./uploads
   upload-products-dir: ./uploads/products
+  upload-pfp-dir: ./uploads/pfps
 spring:
   security:
     jwt:
