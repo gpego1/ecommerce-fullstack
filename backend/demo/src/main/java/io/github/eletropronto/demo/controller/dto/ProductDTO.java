@@ -7,6 +7,7 @@ public record ProductDTO(
         Long id,
         @NotBlank(message = "Required data") String nameProduct,
         @NotBlank(message = "Required data") String description,
-        @NotNull(message = "Required data") Double price
+        @NotNull(message = "Required data") Double price,
+        @NotBlank(message = "Required data") String image
 ) {
 }
